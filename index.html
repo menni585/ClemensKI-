@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ClemensKI</title>
+  
+  <!-- Tailwind CSS & FontAwesome CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            black: '#000000',
+            darkBg: '#050505',
+            darkCard: '#0a0a0a',
+            darkBorder: '#1f1f1f',
+            darkHover: '#171717'
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    body {
+      background-color: #000000;
+      color: #e5e5e5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #000; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+  </style>
+</head>
+<body class="bg-black text-gray-200 h-screen flex flex-col justify-between overflow-hidden">
+
+  <!-- Header -->
+  <header class="bg-black border-b border-zinc-800 px-4 py-3 flex items-center justify-between z-30 relative">
+    <div class="flex flex-col">
+      <h1 class="text-xl font-bold tracking-wider text-white">ClemensKI</h1>
+      <span id="currentModeLabel" class="text-xs text-zinc-400">WEBSITE KI</span>
+    </div>
+
+    <!-- 3-Punkte-Menü Button -->
+    <div class="relative">
+      <button id="menuBtn" class="w-12 h-12 flex items-center justify-center text-zinc-300 hover:text-white rounded-full hover:bg-zinc-900 transition-colors">
+        <i class="fa-solid fa-ellipsis-vertical text-xl"></i>
+      </button>
+
+      <!-- Dropdown Menü -->
+      <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-56 bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl z-50 py-2">
+        <button id="btnNewChat" class="w-full px-4 py-3 text-left text-sm text-zinc-200 hover:bg-zinc-900 flex items-center gap-3">
+          <i class="fa-solid fa-plus text-zinc-400"></i> Neuer Chat
+        </button>
+        <button id="btnHistory" class="w-full px-4 py-3 text-left text-sm text-zinc-200 hover:bg-zinc-900 flex items-center gap-3">
+          <i class="fa-solid fa-clock-rotate-left text-zinc-400"></i> Chat-Verlauf
+        </button>
+        <div class="my-1 border-t border-zinc-800"></div>
+        <button id="btnModeWeb" class="w-full px-4 py-3 text-left text-sm text-zinc-200 hover:bg-zinc-900 flex items-center justify-between">
+          <span class="flex items-center gap-3"><i class="fa-solid fa-code text-zinc-400"></i> Website KI</span>
+          <i id="checkWeb" class="fa-solid fa-check text-xs text-white"></i>
+        </button>
+        <button id="btnModeBiz" class="w-full px-4 py-3 text-left text-sm text-zinc-200 hover:bg-zinc-900 flex items-center justify-between">
+          <span class="flex items-center gap-3"><i class="fa-solid fa-chart-line text-zinc-400"></i> Business KI</span>
+          <i id="checkBiz" class="fa-solid fa-check text-xs text-white hidden"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Chat Content -->
+  <main id="chatContainer" class="flex-1 overflow-y-auto px-4 py-6 space-y-4 custom-scrollbar">
+    <!-- Nachrichten werden hier eingefügt -->
+  </main>
+
+  <!-- Input Area -->
+  <footer class="bg-black border-t border-zinc-800 p-3 z-20">
+    <div class="max-w-4xl mx-auto flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-full px-4 py-2">
+      <input id="userInput" type="text" placeholder="Schreibe eine Nachricht..." class="flex-1 bg-transparent text-white focus:outline-none placeholder-zinc-500 text-sm" />
+      <button id="sendBtn" class="text-white hover:text-zinc-300 p-2">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </div>
+  </footer>
+
+  <script>
+    let currentMode = 'web';
+    
+    const menuBtn = document.getElementById('menuBtn');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const chatContainer = document.getElementById('chatContainer');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const btnModeWeb = document.getElementById('btnModeWeb');
+    const btnModeBiz = document.getElementById('btnModeBiz');
+    const checkWeb = document.getElementById('checkWeb');
+    const checkBiz = document.getElementById('checkBiz');
+    const currentModeLabel = document.getElementById('currentModeLabel');
+
+    // Menü öffnen/schließen
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', () => {
+      dropdownMenu.classList.add('hidden');
+    });
+
+    // Modus wechseln
+    btnModeWeb.addEventListener('click', () => {
+      currentMode = 'web';
+      currentModeLabel.innerText = 'WEBSITE KI';
+      checkWeb.classList.remove('hidden');
+      checkBiz.classList.add('hidden');
+      dropdownMenu.classList.add('hidden');
+    });
+
+    btnModeBiz.addEventListener('click', () => {
+      currentMode = 'biz';
+      currentModeLabel.innerText = 'BUSINESS KI';
+      checkBiz.classList.remove('hidden');
+      checkWeb.classList.add('hidden');
+      dropdownMenu.classList.add('hidden');
+    });
+
+    // Nachricht senden
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', (e) => { 
+      if (e.key === 'Enter') sendMessage(); 
+    });
+
+    function sendMessage() {
+      const text = userInput.value.trim();
+      if (!text) return;
+
+      appendMessage('user', text);
+      userInput.value = '';
+
+      // Text "ClemensKI SCHREIBT..." anzeigen
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'text-xs text-zinc-500 font-mono my-2 animate-pulse';
+      loadingDiv.innerText = 'ClemensKI SCHREIBT...';
+      chatContainer.appendChild(loadingDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      // Simulation einer Antwort nach 1 Sekunde
+      setTimeout(() => {
+        chatContainer.removeChild(loadingDiv);
+        const reply = currentMode === 'web' 
+          ? 'Willkommen bei der Website KI! Wie kann ich dir beim Erstellen deiner Website oder beim Code helfen?' 
+          : 'Willkommen bei der Business KI! Welches Business-Thema oder welche Finanzfragen möchtest du besprechen?';
+        appendMessage('bot', reply);
+      }, 1000);
+    }
+
+    function appendMessage(sender, text) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = sender === 'user' ? 'flex justify-end' : 'flex justify-start';
+      msgDiv.innerHTML = `
+        <div class="${sender === 'user' ? 'bg-zinc-800 text-white' : 'bg-zinc-950 border border-zinc-800 text-zinc-200'} px-4 py-2.5 rounded-2xl max-w-[85%] text-sm">
+          ${text}
+        </div>
+      `;
+      chatContainer.appendChild(msgDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    // Start-Nachricht
+    appendMessage('bot', 'Willkommen bei ClemensKI! Du kannst oben über die 3 Punkte zwischen Website KI und Business KI wechseln.');
+  </script>
+</body>
+</html>
